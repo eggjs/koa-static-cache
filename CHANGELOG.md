@@ -1,3 +1,46 @@
+# Changelog
+
+## [6.0.0](https://github.com/eggjs/koa-static-cache/compare/v5.1.4...v6.0.0) (2025-01-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop Node.js < 18.19.0 support
+
+part of https://github.com/eggjs/egg/issues/3644
+
+https://github.com/eggjs/egg/issues/5257
+
+<!-- This is an auto-generated comment: release notes by coderabbit.ai
+-->
+## Summary by CodeRabbit
+
+- **New Features**
+	- Added static cache middleware for Koa.
+	- Introduced TypeScript support for the package.
+	- Implemented comprehensive configuration for package management.
+
+- **Infrastructure**
+	- Updated GitHub Actions workflows for CI/CD.
+	- Added ESLint configuration.
+	- Updated project build and testing configurations.
+
+- **Documentation**
+	- Refreshed README with new badges and installation instructions.
+	- Updated package description and licensing.
+
+- **Maintenance**
+	- Upgraded Node.js engine support to version 18.19.0+.
+	- Migrated package to `@eggjs/koa-static-cache`.
+	- Removed legacy Travis CI configuration.
+	- Added new TypeScript configuration file.
+- Removed unnecessary files and configurations, streamlining the project
+structure.
+<!-- end of auto-generated comment: release notes by coderabbit.ai -->
+
+### Features
+
+* support cjs and esm both by tshy ([#1](https://github.com/eggjs/koa-static-cache/issues/1)) ([b0524d9](https://github.com/eggjs/koa-static-cache/commit/b0524d95f2f9ac53fb4a8835931c38ff2b33bb80))
 
 5.1.4 / 2020-08-03
 ==================
