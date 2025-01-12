@@ -152,10 +152,10 @@ describe('Static Cache', () => {
 
   it('should serve recursive files', function(done) {
     request(server)
-      .get('/test/index.js')
+      .get('/test/index.test.ts')
       .expect(200)
       .expect('Cache-Control', 'public, max-age=0')
-      .expect('Content-Type', /javascript/)
+      .expect('Content-Type', /video\/mp2t/)
       .end(function(err, res) {
         if (err) return done(err);
 
@@ -190,8 +190,7 @@ describe('Static Cache', () => {
   it('should support HEAD', function(done) {
     request(server)
       .head('/index.js')
-      .expect(200)
-      .expect('', done);
+      .expect(200, done);
   });
 
   it('should support 404 Not Found for other Methods to allow downstream',
@@ -279,17 +278,17 @@ describe('Static Cache', () => {
   });
 
   it('should serve files with gzip buffer', function(done) {
-    const index = fs.readFileSync('index.js');
+    const index = fs.readFileSync(path.join(__dirname, '../CHANGELOG.md'));
     zlib.gzip(index, function(err, content) {
       if (err) return done(err);
       request(server3)
-        .get('/index.js')
+        .get('/CHANGELOG.md')
         .set('Accept-Encoding', 'gzip')
         .expect(200)
         .expect('Cache-Control', 'public, max-age=0')
         .expect('Content-Encoding', 'gzip')
-        .expect('Content-Type', /javascript/)
-        .expect('Content-Length', content.length)
+        .expect('Content-Type', 'text/markdown; charset=utf-8')
+        .expect('Content-Length', `${content.length}`)
         .expect('Vary', 'Accept-Encoding')
         .expect(index.toString())
         .end(function(err, res) {
@@ -314,7 +313,7 @@ describe('Static Cache', () => {
         .expect(200)
         .expect('Cache-Control', 'public, max-age=0')
         .expect('Content-Type', /javascript/)
-        .expect('Content-Length', index.length)
+        .expect('Content-Length', `${index.length}`)
         .expect('Vary', 'Accept-Encoding')
         .expect(index.toString())
         .end(function(err, res) {
@@ -328,17 +327,17 @@ describe('Static Cache', () => {
     });
 
   it('should serve files with gzip stream', function(done) {
-    const index = fs.readFileSync('index.js');
+    const index = fs.readFileSync(path.join(__dirname, '../CHANGELOG.md'));
     zlib.gzip(index, function(err, content) {
       if (err) return done(err);
       assert(content.length > 0);
       request(server4)
-        .get('/index.js')
+        .get('/CHANGELOG.md')
         .set('Accept-Encoding', 'gzip')
         .expect(200)
         .expect('Cache-Control', 'public, max-age=0')
         .expect('Content-Encoding', 'gzip')
-        .expect('Content-Type', /javascript/)
+        .expect('Content-Type', /markdown/)
         .expect('Vary', 'Accept-Encoding')
         .expect(index.toString())
         .end(function(err, res) {
@@ -550,13 +549,13 @@ describe('Static Cache', () => {
     }));
     assert.deepEqual(files, {});
     request(app.listen())
-      .get('/Makefile')
+      .get('/package.json')
       .expect(200, function(err, res) {
         assert(!err);
-        assert(files['/Makefile']);
+        assert(files['/package.json']);
         assert(res.headers['content-length']);
         assert(res.headers['last-modified']);
-        assert.equal(res.headers['content-type'], 'text/x-makefile');
+        assert.equal(res.headers['content-type'], 'application/json; charset=utf-8');
         done();
       });
   });
