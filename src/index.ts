@@ -188,7 +188,7 @@ export function staticCache(
 
     // decode for `/%E4%B8%AD%E6%96%87`
     // normalize for `//index`
-    let filename = path.normalize(safeDecodeURIComponent(ctx.path));
+    let filename = path.posix.normalize(safeDecodeURIComponent(ctx.path));
 
     // check alias
     if (options.alias && options.alias[filename]) {
