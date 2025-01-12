@@ -216,7 +216,11 @@ describe('Static Cache', () => {
   });
 
   it('should be configurable via object', function(done) {
-    files['/package.json'].maxAge = 1;
+    if (process.platform === 'win32') {
+      files['\\package.json'].maxAge = 1;
+    } else {
+      files['/package.json'].maxAge = 1;
+    }
 
     request(server)
       .get('/package.json')
@@ -240,7 +244,8 @@ describe('Static Cache', () => {
       const readme = fs.readFileSync('README.md', 'utf8');
       fs.writeFileSync('README.md', readme, 'utf8');
       const mtime = fs.statSync('README.md').mtime;
-      const md5 = files['/README.md'].md5;
+      const filename = process.platform === 'win32' ? '\\README.md' : '/README.md';
+      const md5 = files[filename].md5;
       request(server)
         .get('/README.md')
         .expect(200, function(err, res) {
@@ -248,9 +253,9 @@ describe('Static Cache', () => {
           assert(res.headers['content-length']);
           assert(res.headers['last-modified']);
           assert(!res.headers.etag);
-          assert.deepEqual(files['/README.md'].mtime, mtime);
+          assert.deepEqual(files[filename].mtime, mtime);
           setTimeout(function() {
-            assert.equal(files['/README.md'].md5, md5);
+            assert.equal(files[filename].md5, md5);
           }, 10);
           done();
         });
@@ -262,7 +267,8 @@ describe('Static Cache', () => {
       const readme = fs.readFileSync('README.md', 'utf8');
       fs.writeFileSync('README.md', readme, 'utf8');
       const mtime = fs.statSync('README.md').mtime;
-      const md5 = files['/README.md'].md5;
+      const filename = process.platform === 'win32' ? '\\README.md' : '/README.md';
+      const md5 = files[filename].md5;
       request(server)
         .get('/README.md')
         .expect(200, function(err, res) {
@@ -270,9 +276,9 @@ describe('Static Cache', () => {
           assert(res.headers['content-length']);
           assert(res.headers['last-modified']);
           assert(!res.headers.etag);
-          assert.deepEqual(files['/README.md'].mtime, mtime);
+          assert.deepEqual(files[filename].mtime, mtime);
           setTimeout(function() {
-            assert.equal(files['/README.md'].md5, md5);
+            assert.equal(files[filename].md5, md5);
           }, 10);
           done();
         });
@@ -424,32 +430,35 @@ describe('Static Cache', () => {
     fs.writeFileSync('a.js', 'hello world a');
     fs.writeFileSync('b.js', 'hello world b');
     fs.writeFileSync('c.js', 'hello world b');
+    const filea = process.platform === 'win32' ? '\\a.js' : '/a.js';
+    const fileb = process.platform === 'win32' ? '\\b.js' : '/b.js';
+    const filec = process.platform === 'win32' ? '\\c.js' : '/c.js';
 
     request(server)
       .get('/a.js')
       .expect(200, function(err) {
-        assert(files.get('/a.js'));
+        assert(files.get(filea));
         assert(!err);
 
         request(server)
           .get('/b.js')
           .expect(200, function(err) {
-            assert(!files.get('/a.js'));
-            assert(files.get('/b.js'));
+            assert(!files.get(filea));
+            assert(files.get(fileb));
             assert(!err);
 
             request(server)
               .get('/c.js')
               .expect(200, function(err) {
-                assert(!files.get('/b.js'));
-                assert(files.get('/c.js'));
+                assert(!files.get(fileb));
+                assert(files.get(filec));
                 assert(!err);
 
                 request(server)
                   .get('/a.js')
                   .expect(200, function(err) {
-                    assert(!files.get('/c.js'));
-                    assert(files.get('/a.js'));
+                    assert(!files.get(filec));
+                    assert(files.get(filea));
                     assert(!err);
                     fs.unlinkSync('a.js');
                     fs.unlinkSync('b.js');
@@ -554,7 +563,8 @@ describe('Static Cache', () => {
       .get('/package.json')
       .expect(200, function(err, res) {
         assert(!err);
-        assert(files['/package.json']);
+        const filename = process.platform === 'win32' ? '\\package.json' : '/package.json';
+        assert(files[filename]);
         assert(res.headers['content-length']);
         assert(res.headers['last-modified']);
         assert.equal(res.headers['content-type'], 'application/json; charset=utf-8');
@@ -571,6 +581,7 @@ describe('Static Cache', () => {
       dynamic: true,
       alias: {
         '/package': '/package.json',
+        '\\package': '\\package.json',
       },
       files,
     }));
@@ -580,8 +591,10 @@ describe('Static Cache', () => {
       .expect(200, function(err, res) {
         if (err) return done(err);
         assert(!err);
-        assert(files['/package.json']);
+        const filename = process.platform === 'win32' ? '\\package.json' : '/package.json';
+        assert(files[filename]);
         assert(!files['/package']);
+        assert(!files['\\package']);
         assert(res.headers['content-length']);
 
         request(app.listen())
@@ -589,7 +602,7 @@ describe('Static Cache', () => {
           .expect(200, function(err, res) {
             if (err) return done(err);
             assert(!err);
-            assert(files['/package.json']);
+            assert(files[filename]);
             assert(Object.keys(files).length === 1);
             assert(res.headers['content-length']);
             done();
