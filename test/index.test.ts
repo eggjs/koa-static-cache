@@ -19,7 +19,7 @@ app.use(staticCache(path.join(__dirname, '..'), {
   alias: {
     '/package': '/package.json',
     // windows
-    '\\package': '/package.json',
+    '\\package': '\\package.json',
   },
   filter(file: string) {
     return !file.includes('node_modules');
