@@ -5,7 +5,7 @@ import { createReadStream, statSync, readFileSync } from 'node:fs';
 import zlib from 'node:zlib';
 import path from 'node:path';
 import mime from 'mime-types';
-import compressible from 'compressible';
+import { compressible } from '@eggjs/compressible';
 import readDir from 'fs-readdir-recursive';
 import { exists, decodeURIComponent as safeDecodeURIComponent } from 'utility';
 
@@ -272,7 +272,7 @@ export function staticCache(
     const shouldGzip = enableGzip
       && file.length! > 1024
       && acceptGzip
-      && compressible(file.type!);
+      && file.type && compressible(file.type);
 
     if (file.buffer) {
       if (shouldGzip) {
