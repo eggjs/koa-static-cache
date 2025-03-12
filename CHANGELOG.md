@@ -1,5 +1,12 @@
 # Changelog
 
+## [6.1.0](https://github.com/eggjs/koa-static-cache/compare/v6.0.0...v6.1.0) (2025-03-12)
+
+
+### Features
+
+* use @eggjs/compressible ([#3](https://github.com/eggjs/koa-static-cache/issues/3)) ([5b68e18](https://github.com/eggjs/koa-static-cache/commit/5b68e1864f8b952a6ce37d944975b7a5c0ba2e0a))
+
 ## [6.0.0](https://github.com/eggjs/koa-static-cache/compare/v5.1.4...v6.0.0) (2025-01-12)
 
 
