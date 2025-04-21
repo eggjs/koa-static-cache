@@ -17,7 +17,7 @@ export type FileFilter = (path: string) => boolean;
 
 export interface FileMeta {
   maxAge?: number;
-  cacheControl?: string;
+  cacheControl?: string | ((path: string) => string);
   buffer?: Buffer;
   zipBuffer?: Buffer;
   type?: string;
@@ -53,7 +53,7 @@ export interface Options {
    * Default to `undefined`
    * Overrides `options.maxAge`
    */
-  cacheControl?: string;
+  cacheControl?: string | ((path: string) => string);
   /**
    * store the files in memory instead of streaming from the filesystem on each request
    */
@@ -326,8 +326,8 @@ function loadFile(name: string, dir: string, options: Options, fileManager: File
   const stats = statSync(filename);
   const buffer = readFileSync(filename);
 
-  obj.cacheControl = options.cacheControl;
-  obj.maxAge = obj.maxAge ? obj.maxAge : options.maxAge || 0;
+  obj.cacheControl = typeof options.cacheControl === 'function' ? options.cacheControl(filename) : options.cacheControl; // if cacheControl is a function, it will be called with the filename
+  obj.maxAge = obj.maxAge !== undefined ? obj.maxAge : (options.maxAge !== undefined ? options.maxAge : 0); // fix: obj.maxAge === 0 will be overwritten by options.maxAge
   obj.type = obj.mime = mime.lookup(pathname) || 'application/octet-stream';
   obj.mtime = stats.mtime;
   obj.length = stats.size;
