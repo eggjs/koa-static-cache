@@ -327,7 +327,7 @@ function loadFile(name: string, dir: string, options: Options, fileManager: File
   const buffer = readFileSync(filename);
 
   obj.cacheControl = typeof options.cacheControl === 'function' ? options.cacheControl(filename) : options.cacheControl; // if cacheControl is a function, it will be called with the filename
-  obj.maxAge = obj.maxAge !== undefined ? obj.maxAge : (options.maxAge !== undefined ? options.maxAge : 0); // fix: obj.maxAge === 0 will be overwritten by options.maxAge
+  obj.maxAge = (typeof obj.maxAge === 'number' ? obj.maxAge : options.maxAge) || 0
   obj.type = obj.mime = mime.lookup(pathname) || 'application/octet-stream';
   obj.mtime = stats.mtime;
   obj.length = stats.size;
