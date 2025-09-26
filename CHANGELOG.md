@@ -1,5 +1,9 @@
 # Changelog
 
+Future changelog will be published to https://github.com/eggjs/koa-static-cache/releases
+
+---
+
 ## [6.1.0](https://github.com/eggjs/koa-static-cache/compare/v6.0.0...v6.1.0) (2025-03-12)
 
 
