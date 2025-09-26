@@ -5,9 +5,11 @@ import zlib from 'node:zlib';
 import http from 'node:http';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
 import { request } from '@eggjs/supertest';
 import { LRU } from 'ylru';
 import { Application as Koa } from '@eggjs/koa';
+
 import { staticCache } from '../src/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -72,6 +74,38 @@ app5.use(staticCache({
 const server5 = http.createServer(app5.callback());
 
 describe('Static Cache', () => {
+  describe('cacheControl function', () => {
+    const app = new Koa();
+    app.use(staticCache({
+      buffer: true,
+      dir: path.join(__dirname, '..'),
+      filter(file: string) {
+        return !file.includes('node_modules');
+      },
+      cacheControl(path) {
+        if (path.includes('index.js')) {
+          return 'public, max-age=1000';
+        }
+        return 'public, max-age=0';
+      },
+    }));
+    const server = app.listen();
+
+    it('should support cacheControl function', function(done) {
+      request(server)
+        .get('/index.js')
+        .expect('Cache-Control', 'public, max-age=1000')
+        .expect(200, done);
+    });
+
+    it('should support cacheControl function', function(done) {
+      request(server)
+        .get('/test/index.test.ts')
+        .expect('Cache-Control', 'public, max-age=0')
+        .expect(200, done);
+    });
+  });
+
   it('should dir priority than options.dir', function(done) {
     const app = new Koa();
     app.use(staticCache(path.join(__dirname, '..'), {
